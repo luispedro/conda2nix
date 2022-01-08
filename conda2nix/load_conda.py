@@ -50,10 +50,16 @@ template_kwargs = {
         'os': os,
         }
 
+
+def normalize_package(pk):
+    if pk.get('requirements') is None:
+        pk['requirements'] = {}
+    return pk
+
 def load_recipe(r):
     with open(path.join(r, 'meta.yaml'), 'rt') as ifile:
         t = jinja2.Template(ifile.read())
-    return yaml.safe_load(''.join(t.generate(**template_kwargs)))
+    return normalize_package(yaml.safe_load(''.join(t.generate(**template_kwargs))))
 
 def load_all(basedir, include_r=False):
     recipes = os.listdir(basedir)

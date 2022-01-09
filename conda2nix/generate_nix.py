@@ -108,7 +108,9 @@ def extract_source(src):
     if type(src) == list:
         src = src[0]
     url = src['url']
-    for method in ['sha256', 'md5']:
+    if type(url) == list:
+        url = url[0]
+    for method in ['sha256']:
         if method in src:
             hash_method = method
             hash_value = src[method]

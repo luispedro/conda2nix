@@ -70,9 +70,6 @@ def all_requirements_of(ell):
 
 requirements_available = set([
         'python',
-        'pandas',
-        'numpy',
-        'scipy',
         'openssl',
         'libpng',
         'libuuid',
@@ -83,10 +80,13 @@ requirements_available = set([
         'cmake',
         ])
 requirements_renamed = {
-        'pip': 'python.pip',
-        'setuptools': 'python.setuptools',
-        'cython': 'python.cython',
-        'biopython': 'python.biopython',
+        'pip': 'python3Packages.pip',
+        'setuptools': 'python3Packages.setuptools',
+        'cython': 'python3Packages.cython',
+        'biopython': 'python3Packages.biopython',
+        'pandas' : 'python3Packages.pandas',
+        'numpy' : 'python3Packages.numpy',
+        'scipy' : 'python3Packages.scipy',
         }
 requirements_stdenv = set([
         'autoconf',

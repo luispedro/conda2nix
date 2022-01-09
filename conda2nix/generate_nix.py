@@ -31,7 +31,7 @@ stdenv.mkDerivation rec {{
 
   meta = with lib; {{
     description = "{description}";
-    homepage = {homepage};
+    homepage = "{homepage}";
     platforms = platforms.all;
     maintainers = with maintainers; [ luispedro ];
   }};

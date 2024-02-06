@@ -56,7 +56,8 @@ set -e
 source $stdenv/setup
 
 PREFIX=$out
-mkdir $out
+mkdir -p $out
+mkdir -p $out/bin
 
 unpackPhase
 cd $sourceRoot
@@ -166,7 +167,10 @@ def normalize_build(b):
 def generate_nix(pk, dirname):
     dependencies = as_dependencies(all_requirements_of(pk), ', ', True)
     buildInputs = as_dependencies(pk.get('requirements', {}).get('build', []), ' ')
-    nativeBuildInputs = as_dependencies(pk.get('requirements', {}).get('run', []), ' ')
+    nativeBuildInputs = as_dependencies(
+                pk.get('requirements', {}).get('run', [])
+                + pk.get('requirements', {}).get('host', [])
+                , ' ')
     build_sh = normalize_build(extract_build(pk))
 
     pname = pk['package']['name']

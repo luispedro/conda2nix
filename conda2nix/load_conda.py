@@ -54,6 +54,9 @@ template_kwargs = {
 def normalize_package(pk):
     if pk.get('requirements') is None:
         pk['requirements'] = {}
+    for r in ['host', 'build', 'run']:
+        if pk.get('requirements').get(r) is None:
+            pk['requirements'][r] = []
     return pk
 
 def load_recipe(r):

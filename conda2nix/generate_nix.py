@@ -87,6 +87,7 @@ requirements_available = set([
         'perl',
         'pandoc',
         'cmake',
+        'htslib',
         ])
 requirements_renamed = {
         'pip': 'python3Packages.pip',

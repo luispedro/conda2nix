@@ -1,3 +1,4 @@
+import multiprocessing
 from os import path
 import yaml
 import os
@@ -66,15 +67,26 @@ def load_recipe(r):
 
 def load_all(basedir, include_r=False):
     recipes = os.listdir(basedir)
-    metas = {}
 
-    for r in recipes:
-         if not include_r and (r.startswith('r-') or r.startswith('bioconductor-')):
-             continue
-         if not path.exists(path.join(basedir, r, 'meta.yaml')):
-             continue
-         r = load_recipe(path.join(basedir, r))
-         metas[r['package']['name']] = r
-    return metas
+    loaded = []
+    with multiprocessing.Pool() as p:
+        for r in recipes:
+             if not include_r and (r.startswith('r-') or r.startswith('bioconductor-')):
+                 continue
+             if not path.exists(path.join(basedir, r, 'meta.yaml')):
+                 continue
+
+             loaded.append(
+                     p.apply_async(
+                         load_recipe,
+                         args=(path.join(basedir, r),)
+                         ))
+        p.close()
+        p.join()
+    loaded = [ell.get() for ell in loaded]
+    return {
+            r['package']['name']: r
+            for r in loaded
+            }
 
 

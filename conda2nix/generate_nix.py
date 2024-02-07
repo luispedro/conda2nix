@@ -192,6 +192,7 @@ def as_dependencies(deps, sep, is_top=False):
         dependencies = [dep.split('.')[0] for dep in dependencies]
         dependencies.append('stdenv')
         dependencies.append('lib')
+        dependencies.append('zlib')
         dependencies.append('fetchurl')
     return sep.join(set(dependencies))
 

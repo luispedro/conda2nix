@@ -30,10 +30,12 @@ def pin_compatible(x, max_pin=None):
         'h5py',
         'glib',
         'numpy',
+        'pandas',
         'ldc']: return x
-    raise ValueError(x)
+    return x
+#    raise ValueError(x)
 
-def pin_subpackage(x, exact=False, max_pin=None):
+def pin_subpackage(x, exact=False, max_pin=None, allow_no_other_outputs=True):
     return x
 
 def environ(x):
@@ -49,6 +51,7 @@ template_kwargs = {
         'environ': environ,
         'cdt': cdt,
         'os': os,
+        'PYTHON': 'python',
         }
 
 
@@ -63,7 +66,9 @@ def normalize_package(pk):
 def load_recipe(r):
     with open(path.join(r, 'meta.yaml'), 'rt') as ifile:
         t = jinja2.Template(ifile.read())
-    return normalize_package(yaml.safe_load(''.join(t.generate(**template_kwargs))))
+    return normalize_package(
+                yaml.safe_load(
+                    ''.join(t.generate(**template_kwargs))))
 
 def load_all(basedir, include_r=False):
     recipes = os.listdir(basedir)

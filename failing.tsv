@@ -1,0 +1,9 @@
+# Three colummns
+# 1. Name of the package (original bioconda name)
+# 2. Reason that fails (should be one of prepackaged, nix, download, build, test)
+# 3. Free form comment (e.g., error message)
+package	reason	comment
+abacas	nix	do not know how to unpack source archive /nix/store/b7d5jqp2zqw4yd7d74zrzb6cbj5y0q76-abacas.1.3.1.pl
+actc	prepackaged	-
+admixture	download	unable to resolve host address 'www.genetics.ucla.edu'
+agc	prepackaged	-

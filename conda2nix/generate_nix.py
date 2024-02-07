@@ -75,6 +75,10 @@ TEMPLATE_SRC_URL = '''
 PRE_BUILD_SH = '''
 set -e
 
+PKG_NAME={pname}
+PKG_VERSION={version}
+PKG_BUILDNUM=0
+
 source $stdenv/setup
 
 PREFIX=$out
@@ -202,7 +206,10 @@ def extract_build(pk):
             base = '\n'.join(script)
     if base is None:
         raise KeyError(f'Could not extract buildPhase from {pk}')
-    return PRE_BUILD_SH + base
+    pre_build = PRE_BUILD_SH.format(
+            pname=pk['package']['name'],
+            version=pk['package']['version'])
+    return pre_build + base
 
 
 def normalize_build(b):

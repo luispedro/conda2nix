@@ -6,6 +6,10 @@ import os
 from conda2nix.load_conda import load_all
 from conda2nix.generate_nix import generate_nix, all_requirements_of, conda2nix_requirement
 
+IGNORED = set([
+    'ShortSeq',
+    'aragorn',
+    ])
 
 def main():
     metas = load_all('bioconda-recipes/recipes', include_r=False)
@@ -14,6 +18,12 @@ def main():
 
     pkg_status = {}
     missing_deps = []
+
+
+    for pk in IGNORED:
+        if pk in metas:
+            metas.pop(pk)
+            pkg_status[pk] = 'IGNORED'
 
     for pk,met in metas.items():
         rs = list(all_requirements_of(met))
@@ -49,7 +59,6 @@ def main():
 
     pkg_status_counts = Counter(pkg_status.values())
     missing_deps = pd.Series(Counter(missing_deps)).sort_values()[::-1]
-    missing_deps[:20]
 
     print(f'''
 Generated nix scripts

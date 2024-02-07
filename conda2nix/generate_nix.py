@@ -178,9 +178,13 @@ def extract_source(src):
         raise KeyError(f'Could not find hash in {src}')
     return TEMPLATE_SRC_URL.format(url=url, hash_value=hash_value, hash_method=hash_method)
 
+def strip_version(r):
+    return re.split(r'[ <=>]',r)[0]
+
 def as_dependencies(deps, sep, is_top=False):
     if deps is None:
         return ''
+    deps = [strip_version(r) for r in deps]
     dependencies = [conda2nix_requirement(r)
                 for r in deps]
     dependencies = [dep for dep in dependencies if dep]

@@ -91,6 +91,7 @@ requirements_available = set([
         'htslib',
         ])
 requirements_renamed = {
+        'python': 'python3',
         'pip': 'python3Packages.pip',
         'setuptools': 'python3Packages.setuptools',
         'cython': 'python3Packages.cython',
@@ -98,6 +99,20 @@ requirements_renamed = {
         'pandas' : 'python3Packages.pandas',
         'numpy' : 'python3Packages.numpy',
         'scipy' : 'python3Packages.scipy',
+        'scikit-learn': 'python3Packages.scikit-learn',
+        'matplotlib-base': 'python3Packages.matplotlib',
+        'matplotlib': 'python3Packages.matplotlib',
+        'six': 'python3Packages.six',
+        'pyyaml': 'python3Packages.pyyaml',
+        'requests': 'python3Packages.requests',
+        'tqdm': 'python3Packages.tqdm',
+        'seaborn': 'python3Packages.seaborn',
+        'joblib': 'python3Packages.joblib',
+
+        'mysql-connector-c': 'libmysqlconnectorcpp',
+        'wget': 'wget',
+        'pigz': 'pigz',
+
         }
 requirements_stdenv = set([
         'autoconf',

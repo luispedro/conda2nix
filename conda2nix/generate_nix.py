@@ -2,6 +2,28 @@ import os
 from os import path
 import re
 
+PYTHON_PACKAGE_TEMPLATE = '''
+{{ {dependencies} }}:
+
+python3Packages.buildPythonPackage rec {{
+  pname = "{pname}";
+  version = "{version}";
+
+  {src}
+
+  buildInputs = [ {buildInputs} ];
+  nativeBuildInputs = [ {nativeBuildInputs} ];
+  doCheck = false;
+
+  meta = with lib; {{
+    description = "{description}";
+    homepage = "{homepage}";
+    platforms = platforms.all;
+    maintainers = with maintainers; [ luispedro ];
+  }};
+}}
+'''
+
 TEMPLATE = '''
 {{ {dependencies} }}:
 
@@ -63,6 +85,13 @@ unpackPhase
 cd $sourceRoot
 
 '''
+
+def is_python_build(pk):
+    import re
+    build_script = pk['build'].get('script')
+    if build_script is None: return False
+    return build_script.startswith('python -m pip install')
+
 
 def norm_requirement(r):
     return re.split(r'[ <=>]',r)[0]
@@ -168,7 +197,7 @@ def extract_build(pk):
     elif 'script' in pk['build']:
         script = pk['build']['script']
         if type(script) == str:
-            base = 'python ' + pk['build']['script']
+            base = pk['build']['script']
         elif type(script) == list:
             base = '\n'.join(script)
     if base is None:
@@ -198,9 +227,15 @@ def generate_nix(pk, dirname):
     src = extract_source(pk['source'])
     odir = f'{dirname}/{pk["package"]["name"]}'
     os.makedirs(odir, exist_ok=True)
-    with open(f'{odir}/default.nix', 'wt') as out:
-        out.write(TEMPLATE.format(**locals()))
-    with open(f'{odir}/build.sh', 'wt') as out:
-        out.write(build_sh)
+
+    if is_python_build(pk):
+        with open(f'{odir}/default.nix', 'wt') as out:
+            out.write(PYTHON_PACKAGE_TEMPLATE.format(**locals()))
+    else:
+        build_sh = normalize_build(extract_build(pk))
+        with open(f'{odir}/default.nix', 'wt') as out:
+            out.write(TEMPLATE.format(**locals()))
+        with open(f'{odir}/build.sh', 'wt') as out:
+            out.write(build_sh)
     return pk['package']['name']
 

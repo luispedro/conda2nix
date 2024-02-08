@@ -63,9 +63,50 @@ def normalize_package(pk):
             pk['requirements'][r] = []
     return pk
 
+VARS = {
+        'osx': False,
+        'osx-amd64': False,
+        'osx-arm64': False,
+        'arm64': False,
+        'win': False,
+
+        'amd64': True,
+        'x86_64': True,
+        'unix': True,
+        'linux': True,
+        'linux64': True,
+
+        'py3k': True,
+        'py2k': False,
+        'py': 311,
+        'py27': False,
+        'py34': False,
+        'py35': False,
+        'py36': False,
+
+        'perl': 5.26,
+        'mpi': 'mpi',
+        'cdt_name': 'cdt',
+        }
+
+def is_line_linux(ell):
+    import re
+    if m := re.search('# +\[(.+)\]\s*$', ell):
+        cond = m.group(1)
+        try:
+            return eval(cond, {}, VARS)
+        except:
+            print(ell)
+            raise
+    return True
+
+def only_linux_lines(s):
+    lines = [ell for ell in s.split('\n') if is_line_linux(ell)]
+    return '\n'.join(lines)
+
 def load_recipe(r):
     with open(path.join(r, 'meta.yaml'), 'rt') as ifile:
-        t = jinja2.Template(ifile.read())
+        t = jinja2.Template(only_linux_lines(ifile.read()))
     return normalize_package(
                 yaml.safe_load(
                     ''.join(t.generate(**template_kwargs))))

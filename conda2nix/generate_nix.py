@@ -87,6 +87,7 @@ mkdir -p $out/bin
 
 unpackPhase
 cd $sourceRoot
+export SRC_DIR="$(pwd)"
 
 '''
 

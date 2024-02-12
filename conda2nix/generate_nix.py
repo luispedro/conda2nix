@@ -1,5 +1,6 @@
 import os
 from os import path
+import shutil
 import re
 
 PYTHON_PACKAGE_TEMPLATE = '''
@@ -24,7 +25,7 @@ python3Packages.buildPythonPackage rec {{
 }}
 '''
 
-TEMPLATE = '''
+NIX_TEMPLATE = '''
 {{ {dependencies} }}:
 
 stdenv.mkDerivation rec {{
@@ -70,6 +71,7 @@ TEMPLATE_SRC_URL = '''
     url = "{url}";
     {hash_method} = "{hash_value}";
   }};
+  {patches}
 '''
 
 PRE_BUILD_SH = '''
@@ -164,7 +166,7 @@ def conda2nix_requirement(r):
         return r
 
 
-def extract_source(src):
+def extract_source(src, patch_files):
     if type(src) == list:
         src = src[0]
     url = src['url']
@@ -177,7 +179,15 @@ def extract_source(src):
             break
     else:
         raise KeyError(f'Could not find hash in {src}')
-    return TEMPLATE_SRC_URL.format(url=url, hash_value=hash_value, hash_method=hash_method)
+    if patch_files:
+        patches = 'patches = [ ' + ' '.join([f'./{p}' for p in patch_files]) + ' ];'
+    else:
+        patches = ''
+    return TEMPLATE_SRC_URL.format(
+                        url=url,
+                        hash_value=hash_value,
+                        hash_method=hash_method,
+                        patches=patches)
 
 def strip_version(r):
     return re.split(r'[ <=>]',r)[0]
@@ -237,8 +247,10 @@ def generate_nix(pk, dirname):
                 .replace('"', r'\"') \
                 .replace('$', r'\$')
     homepage = pk['about']['home']
-    src = extract_source(pk['source'])
     odir = f'{dirname}/{pk["package"]["name"]}'
+    patch_files = pk.get('source', {}).get('patches', [])
+
+    src = extract_source(pk['source'], patch_files)
     os.makedirs(odir, exist_ok=True)
 
     if is_python_build(pk):
@@ -247,7 +259,9 @@ def generate_nix(pk, dirname):
     else:
         build_sh = normalize_build(extract_build(pk))
         with open(f'{odir}/default.nix', 'wt') as out:
-            out.write(TEMPLATE.format(**locals()))
+            out.write(NIX_TEMPLATE.format(**locals()))
+        for p in patch_files:
+            shutil.copy(f'bioconda-recipes/recipes/{pname}/{p}', f'{odir}/{p}')
         with open(f'{odir}/build.sh', 'wt') as out:
             out.write(build_sh)
     return pk['package']['name']

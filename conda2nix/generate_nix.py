@@ -256,6 +256,8 @@ def generate_nix(pk, dirname):
     if is_python_build(pk):
         with open(f'{odir}/default.nix', 'wt') as out:
             out.write(PYTHON_PACKAGE_TEMPLATE.format(**locals()))
+        for p in patch_files:
+            shutil.copy(f'bioconda-recipes/recipes/{pname}/{p}', f'{odir}/{p}')
     else:
         build_sh = normalize_build(extract_build(pk))
         with open(f'{odir}/default.nix', 'wt') as out:
